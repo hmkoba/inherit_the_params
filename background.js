@@ -19,6 +19,7 @@ chrome.webRequest.onBeforeRequest.addListener( function( detail ) {
 domain = localStorage.getItem("domain");
 tkParam = localStorage.getItem("param");
 
+console.log("url:" + detail.url);
 console.log("domain:" + domain + "  param:" + tkParam + " length:" + tkParam.length);
 
     // オプション未指定時は処理を行わない
@@ -70,7 +71,6 @@ console.log("currentUrl:" + currentUrl);
     var param = "";
     if(tmp.length >= 2){
       params = tmp[1].split('&');
-console.log("param: " + params);
 
       for(var i = 0; i < params.length; i++) {
         if(params[i].indexOf(tkParam) >= 0) {
