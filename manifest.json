@@ -1,7 +1,7 @@
 {
   "name": "TakeOverParam",
   "version": "0.0.3",
-  "manifest_version": 3,
+  "manifest_version": 2,
   "description": "特定のパラメータを引き継ぐ",
   "permissions": [
     "webRequest",

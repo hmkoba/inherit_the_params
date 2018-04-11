@@ -11,7 +11,9 @@ if(tkParam == null) {
     localStorage["param"] = "";
 }
 
-
+//
+// リクエスト開始直前でURL変更
+//
 chrome.webRequest.onBeforeRequest.addListener( function( detail ) {
 
 domain = localStorage.getItem("domain");

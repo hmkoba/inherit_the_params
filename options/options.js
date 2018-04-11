@@ -17,5 +17,7 @@ $(function(){
 
     localStorage["domain"] = $("#input_domain").val();
     localStorage["param"] = $("#input_param").val();
+    
+    window.open('about:blank','_self').close();
   });
 });
