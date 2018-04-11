@@ -1,0 +1,20 @@
+{
+  "name": "TakeOverParam",
+  "version": "0.0.2",
+  "manifest_version": 2,
+  "description": "特定のパラメータを引き継ぐ",
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "<all_urls>",
+    "storage"
+  ],
+
+  "background": {
+    "scripts": ["add_dt.js"]
+  },
+  "options_ui": {
+    "page": "options.html",
+    "chrome_style": true
+  }
+}
