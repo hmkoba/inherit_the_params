@@ -11,8 +11,7 @@ $(function(){
     $("#input_param").val(localStorage.getItem("param"));
   });
 
-  // セーブボタンが押されたら、
-  // ローカルストレージに保存する。
+  // 保存ボタンが押されたら、ローカルストレージに保存する。
   $("#save").click(function () {
     console.log("aa:" + $("#input_domain").val());
 
