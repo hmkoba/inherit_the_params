@@ -4,11 +4,27 @@ var domain = localStorage.getItem("domain");
 var tkParam = localStorage.getItem("param");
 
 if(!domain) {
-    localStorage["domain"] = "https://*/*";
-    domain = localStorage.getItem("domain");
+  localStorage["domain"] = "https://*/*";
+  domain = localStorage.getItem("domain");
 }
 if(tkParam == null) {
-    localStorage["param"] = "";
+  localStorage["param"] = "";
+}
+
+
+function isParamExist(url, param) {
+
+  var paramStart = url.lastIndexOf('?');
+  if(paramStart <= -1) {
+    return false;
+  }
+
+  var paramIndex = url.lastIndexOf(param);
+  if(paramIndex <= -1 || paramIndex < paramStart) {
+    return false;
+  }
+
+  return true;
 }
 
 //
@@ -16,14 +32,11 @@ if(tkParam == null) {
 //
 chrome.webRequest.onBeforeRequest.addListener( function( detail ) {
 
-domain = localStorage.getItem("domain");
-tkParam = localStorage.getItem("param");
+    tkParam = localStorage.getItem("param");
 
-console.log("url:" + detail.url);
-console.log("domain:" + domain + "  param:" + tkParam + " length:" + tkParam.length);
 
     // オプション未指定時は処理を行わない
-    if(domain == "" || tkParam == "") {
+    if(!domain || !tkParam) {
         return;
     }
 
@@ -33,66 +46,59 @@ console.log("domain:" + domain + "  param:" + tkParam + " length:" + tkParam.len
     chrome.tabs.query( { active: true, windowId: chrome.windows.WINDOW_ID_CURRENT }, 
                          function( tabs ) { currentUrl = tabs[0].url; });
 
-console.log("currentUrl:" + currentUrl);
 
     // 遷移元URLが無い場合は処理を行わない
-    if(currentUrl == "") {
+    if(!currentUrl) {
         return;
     }
 
-    var isCurrentParamExist = currentUrl.indexOf('?');
-    var isCurrentParam = currentUrl.indexOf(tkParam);
-    // ?の前に指定パラメータがあったら無視
-    if(isCurrentParam <= isCurrentParamExist) {
-        isCurrentParam = -1;
-    }
-
-    // 遷移前のURLに指定パラメータパラメータが無ければ処理を行わない
-    if(isCurrentParam == -1) {
+    // 遷移元に対象パラメータが無い場合は処理不要
+    if(!isParamExist(currentUrl, tkParam)) {
       return;
     }
 
-    // 遷移先のURLを取得
-    var url = detail.url;
-    var isParamExist = url.indexOf('?');
-    var isParam = url.indexOf(tkParam);
-
-    // ?の前に指定パラメータがあったら無視
-    if(isParam <= isParamExist) {
-        isParam = -1;
-    }
-    // 遷移先URLに指定のパラメータが存在する、
-    // もしくはパラメータ開始前のURLがディレクトリじゃない場合は処理を行わない
-    if(isParam >= 0 || (isParamExist == -1 && url.slice(-1) != "/")){
+    // 遷移先に対象パラメータが「存在する」場合は処理不要、上書きはしない
+    if(isParamExist(detail.url, tkParam)) {
       return;
     }
 
-    var tmp = currentUrl.split('?');
-    var param = "";
-    if(tmp.length >= 2){
-      params = tmp[1].split('&');
-
-      for(var i = 0; i < params.length; i++) {
-        if(params[i].indexOf(tkParam) >= 0) {
-          param = params[i].slice(tkParam.length);
-          break;
-        }
+    // パラメータ前がファイル名(.があるか)の場合は処理しない
+    var splitedUrl = detail.url.split("?");
+    if(splitedUrl[0].slice(-1) != "/") {
+      var tmp = splitedUrl[0].split("/");
+      if(tmp[tmp.length-1].indexOf(".") >= 0) {
+        return;
       }
     }
-console.log("param:" + param);
 
-    if(isParamExist == -1){
-      var newUrl = detail.url + "?" + tkParam + param;
+//console.log("domain:" + domain + "  param:" + tkParam);
+//console.log("url:" + detail.url);
+//console.log("currentUrl:" + currentUrl);
+
+    // 遷移元URLから対象パラメータの値を取得
+    var param = "";
+    var splitedCurrentUrl = currentUrl.split("?");
+    params = splitedCurrentUrl[1].split('&');
+    for(var i = 0; i < params.length; i++) {
+      if(params[i].indexOf(tkParam) >= 0) {
+        param = params[i];
+        break;
+      }
+    }
+//console.log("param:" + param);
+
+    if(detail.url.indexOf("?") <= -1){
+      var newUrl = detail.url + "?" + param;
     } else {
-      var newUrl = detail.url + "&" + tkParam + param;
+      var newUrl = detail.url + "&" + param;
     }
 
-console.log("Loading: " + newUrl);
+console.log("RedirectTo: " + newUrl);
 
     return { redirectUrl: newUrl };
   }, 
 
-  { urls: [ domain ] },
+  { urls: [ "https://*.gnavi.co.jp/sp/*" ] },
 
   [
     "blocking"
