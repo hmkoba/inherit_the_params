@@ -1,23 +1,27 @@
 
 $(function(){
   $(document).ready(function () {
-    console.log("bb:" + localStorage.getItem("domain"));
 
-    $("#input_domain").val(localStorage.getItem("domain"));
-    if($("#input_domain").val() == "") {
-        $("#input_domain").val("https://*/*");
+    $("#input-domain").val(localStorage.getItem("domain"));
+    if($("#input-domain").val() == "") {
+        $("#input-domain").val("https://*/*");
     }
 
-    $("#input_param").val(localStorage.getItem("param"));
+    $("#input-param").val(localStorage.getItem("param"));
+  });
+
+  $("#cb1").change(function () {
+    if($("#cb1").prop('checked')) {
+      $("#status").text("有効");
+    } else {
+      $("#status").text("無効");
+    }
   });
 
   // 保存ボタンが押されたら、ローカルストレージに保存する。
   $("#save").click(function () {
-    console.log("aa:" + $("#input_domain").val());
-
-    localStorage["domain"] = $("#input_domain").val();
-    localStorage["param"] = $("#input_param").val();
-    
+    localStorage["domain"] = $("#input-domain").val();
+    localStorage["param"] = $("#input-param").val();
     window.open('about:blank','_self').close();
   });
 });

@@ -4,12 +4,29 @@
 　　<meta charset="utf-8">
 　　<script src="../lib/jquery.min.js"></script>
 　　<script src="options.js"></script>
-　　<link rel="stylesheet" href="options.css" type="text/css" />
+　　<link rel="stylesheet" href="style.css" media="screen" type="text/css" />
 </head>
 <body>
 <h1>オプション</h1>
-<div class="item_title">対象URL: </div><input id="input_domain" type="text" value="" />
-<div class="item_title">対象パラメータ：</div><input id="input_param" type="text" value="" />
+<table>
+<tr>
+  <td><h4><div id="status">無効</div></h4></td>
+  <td>
+    <input class='tgl tgl-light' id='cb1' type='checkbox'>
+    <label class='tgl-btn' for='cb1'></label>
+  </td>
+</tr>
+</table>
+<table class="input-item-table">
+<tr>
+  <td><h4>対象URL</h4></td>
+  <td><input id="input-domain" type="text" value="" /></td>
+</tr>
+<tr>
+  <td><h4>対象パラメータ</h4></td>
+  <td><input id="input-param" type="text" value="" /></td>
+</tr>
+</table>
 <input id="save" type="submit" value="保存" />
 </body>
 <html>
