@@ -2,15 +2,33 @@ var currentUrl = "";
 
 var domain = localStorage.getItem("domain");
 var tkParam = localStorage.getItem("param");
-
-if(!domain) {
-  localStorage["domain"] = "https://*/*";
-  domain = localStorage.getItem("domain");
-}
 if(tkParam == null) {
   localStorage["param"] = "";
 }
 
+activeAddParam();
+
+function activeAddParam() {
+  console.log("++++++++++++++++++++++++++++++++++++++");
+  domain = localStorage.getItem("domain");
+  if(!domain) {
+    localStorage["domain"] = "https://*/*";
+    domain = localStorage.getItem("domain");
+  }
+  chrome.webRequest.onBeforeRequest.addListener(
+    redirectWithParam,
+    { urls: [ domain ] },
+
+    [
+      "blocking"
+    ]
+  );
+}
+
+function inactiveAddParam() {
+  console.log("--------------------------------------");
+  chrome.webRequest.onBeforeRequest.removeListener(redirectWithParam);
+}
 
 function isParamExist(url, param) {
 
@@ -27,13 +45,9 @@ function isParamExist(url, param) {
   return true;
 }
 
-//
-// リクエスト開始直前でURL変更
-//
-chrome.webRequest.onBeforeRequest.addListener( function( detail ) {
+function redirectWithParam( detail ) {
 
     tkParam = localStorage.getItem("param");
-
 
     // オプション未指定時は処理を行わない
     if(!domain || !tkParam) {
@@ -43,7 +57,7 @@ chrome.webRequest.onBeforeRequest.addListener( function( detail ) {
     tkParam = tkParam + "=";
 
     // 遷移前のURLを取得
-    chrome.tabs.query( { active: true, windowId: chrome.windows.WINDOW_ID_CURRENT }, 
+    chrome.tabs.query( { active: true, windowId: chrome.windows.WINDOW_ID_CURRENT },
                          function( tabs ) { currentUrl = tabs[0].url; });
 
 
@@ -96,11 +110,4 @@ chrome.webRequest.onBeforeRequest.addListener( function( detail ) {
 console.log("RedirectTo: " + newUrl);
 
     return { redirectUrl: newUrl };
-  }, 
-
-  { urls: [ "https://*.gnavi.co.jp/sp/*" ] },
-
-  [
-    "blocking"
-  ]
-);
+}

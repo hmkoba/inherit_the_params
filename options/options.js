@@ -11,10 +11,13 @@ $(function(){
   });
 
   $("#cb1").change(function () {
+    var bg = chrome.extension.getBackgroundPage();
     if($("#cb1").prop('checked')) {
       $("#status").text("有効");
+      bg.activeAddParam();
     } else {
       $("#status").text("無効");
+      bg.inactiveAddParam();
     }
   });
 
