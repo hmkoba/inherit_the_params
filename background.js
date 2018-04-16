@@ -1,33 +1,44 @@
 var currentUrl = "";
 
-var domain = localStorage.getItem("domain");
-var tkParam = localStorage.getItem("param");
-if(tkParam == null) {
-  localStorage["param"] = "";
-}
+var domain = "";
+var tkParam = "";
+localStorage["isActive"] = false;
 
+init();
 activeAddParam();
 
+function init() {
+  domain = localStorage.getItem("domain");
+  tkParam = localStorage.getItem("param");
+  if(tkParam == null) {
+    localStorage["param"] = "";
+  }
+}
+
+function restart() {
+  inactiveAddParam();
+  activeAddParam();
+}
+
 function activeAddParam() {
-  console.log("++++++++++++++++++++++++++++++++++++++");
   domain = localStorage.getItem("domain");
   if(!domain) {
     localStorage["domain"] = "https://*/*";
     domain = localStorage.getItem("domain");
   }
+  console.log("++++++++++++++++++++++++++++++++++++++ domain:" + domain);
   chrome.webRequest.onBeforeRequest.addListener(
     redirectWithParam,
     { urls: [ domain ] },
-
-    [
-      "blocking"
-    ]
+    [ "blocking" ]
   );
+  localStorage["isActive"] = true;
 }
 
 function inactiveAddParam() {
   console.log("--------------------------------------");
   chrome.webRequest.onBeforeRequest.removeListener(redirectWithParam);
+  localStorage["isActive"] = false;
 }
 
 function isParamExist(url, param) {
@@ -59,7 +70,6 @@ function redirectWithParam( detail ) {
     // 遷移前のURLを取得
     chrome.tabs.query( { active: true, windowId: chrome.windows.WINDOW_ID_CURRENT },
                          function( tabs ) { currentUrl = tabs[0].url; });
-
 
     // 遷移元URLが無い場合は処理を行わない
     if(!currentUrl) {

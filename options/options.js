@@ -8,6 +8,8 @@ $(function(){
     }
 
     $("#input-param").val(localStorage.getItem("param"));
+
+    $("#cb1").prop('checked') = localStorage.getItem("isActive");
   });
 
   $("#cb1").change(function () {
@@ -25,6 +27,8 @@ $(function(){
   $("#save").click(function () {
     localStorage["domain"] = $("#input-domain").val();
     localStorage["param"] = $("#input-param").val();
+    var bg = chrome.extension.getBackgroundPage();
+    bg.restart();
     window.open('about:blank','_self').close();
   });
 });
