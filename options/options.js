@@ -9,6 +9,11 @@ $(function(){
 
     $("#input-param").val(localStorage.getItem("param"));
     $("#cb1").prop("checked", localStorage.getItem("isActive") == "true");
+    if($("#cb1").prop('checked')) {
+      $("#status").text("有効");
+    } else {
+      $("#status").text("無効");
+    }
   });
 
   $("#cb1").change(function () {
