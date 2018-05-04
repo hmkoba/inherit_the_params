@@ -1,44 +1,54 @@
 var currentUrl = "";
 
-var domain = "";
-var tkParam = "";
-localStorage["isActive"] = false;
-
 init();
-activeAddParam();
 
 function init() {
-  domain = localStorage.getItem("domain");
-  tkParam = localStorage.getItem("param");
-  if(tkParam == null) {
-    localStorage["param"] = "";
+  if(localStorage["isParamsActive"] == null) {
+    localStorage["isParamsActive"] = false;
+  }
+  if(localStorage["isDomainActive"] == null) {
+    localStorage["isDomainActive"] = false;
+  }
+
+  var params = localStorage.getItem("params");
+
+  if(params == null) {
+    localStorage["params"] = "";
+  }
+
+  if(localStorage["isParamsActive"] == true) {
+    activeAddParams();
+  }
+
+  if(localStorage["isDomainActive"] == true) {
+    activeRewriteDomain();
   }
 }
 
-function restart() {
-  inactiveAddParam();
-  activeAddParam();
+function restartAddParams() {
+  inactiveAddParams();
+  activeAddParams();
 }
 
-function activeAddParam() {
-  domain = localStorage.getItem("domain");
-  if(!domain) {
-    localStorage["domain"] = "https://*/*";
-    domain = localStorage.getItem("domain");
+function activeAddParams() {
+  var params_url = localStorage.getItem("params-url");
+  if(!params_url) {
+    localStorage["params-url"] = "https://*/*";
+    params_url = localStorage.getItem("params-url");
   }
-  console.log("++++++++++++++++++++++++++++++++++++++ domain:" + domain);
+  console.log("++++++++++++++++++++++++++++++++++++++ params-url:" + params_url);
   chrome.webRequest.onBeforeRequest.addListener(
-    redirectWithParam,
-    { urls: [ domain ] },
+    redirectWithParams,
+    { urls: [ params_url ] },
     [ "blocking" ]
   );
-  localStorage["isActive"] = true;
+  localStorage["isParamsActive"] = true;
 }
 
-function inactiveAddParam() {
+function inactiveAddParams() {
   console.log("--------------------------------------");
-  chrome.webRequest.onBeforeRequest.removeListener(redirectWithParam);
-  localStorage["isActive"] = false;
+  chrome.webRequest.onBeforeRequest.removeListener(redirectWithParams);
+  localStorage["isParamsActive"] = false;
 }
 
 function isParamExist(url, param) {
@@ -56,16 +66,17 @@ function isParamExist(url, param) {
   return true;
 }
 
-function redirectWithParam( detail ) {
+function redirectWithParams( detail ) {
 
-    tkParam = localStorage.getItem("param");
+    var params_url = localStorage.getItem("params-url");
+    var params = localStorage.getItem("params");
 
     // オプション未指定時は処理を行わない
-    if(!domain || !tkParam) {
+    if(!params_url || !params) {
         return;
     }
 
-    tkParam = tkParam + "=";
+    params = params + "=";
 
     // 遷移前のURLを取得
     chrome.tabs.query( { active: true, windowId: chrome.windows.WINDOW_ID_CURRENT },
@@ -77,12 +88,12 @@ function redirectWithParam( detail ) {
     }
 
     // 遷移元に対象パラメータが無い場合は処理不要
-    if(!isParamExist(currentUrl, tkParam)) {
+    if(!isParamExist(currentUrl, params)) {
       return;
     }
 
     // 遷移先に対象パラメータが「存在する」場合は処理不要、上書きはしない
-    if(isParamExist(detail.url, tkParam)) {
+    if(isParamExist(detail.url, params)) {
       return;
     }
 
@@ -95,29 +106,68 @@ function redirectWithParam( detail ) {
       }
     }
 
-//console.log("domain:" + domain + "  param:" + tkParam);
+//console.log("params_url:" + params_url + "  param:" + tkParam);
 //console.log("url:" + detail.url);
 //console.log("currentUrl:" + currentUrl);
 
     // 遷移元URLから対象パラメータの値を取得
-    var param = "";
+    var org_param = "";
     var splitedCurrentUrl = currentUrl.split("?");
-    params = splitedCurrentUrl[1].split('&');
+    org_params = splitedCurrentUrl[1].split('&');
     for(var i = 0; i < params.length; i++) {
-      if(params[i].indexOf(tkParam) >= 0) {
-        param = params[i];
+      if(org_params[i].indexOf(params) >= 0) {
+        org_param = org_params[i];
         break;
       }
     }
 //console.log("param:" + param);
 
     if(detail.url.indexOf("?") <= -1){
-      var newUrl = detail.url + "?" + param;
+      var newUrl = detail.url + "?" + org_param;
     } else {
-      var newUrl = detail.url + "&" + param;
+      var newUrl = detail.url + "&" + org_param;
     }
 
 console.log("RedirectTo: " + newUrl);
 
     return { redirectUrl: newUrl };
+}
+
+function restartRewriteDomain() {
+  inactiveRewriteDomain();
+  activeRewriteDomain();
+}
+function activeRewriteDomain() {
+  var rewrite_domain = localStorage.getItem("rewrite-domain");
+  if(!rewrite_domain || rewrite_domain == "") {
+      return;
+  }
+
+  console.log("++++++++++++++++++++++++++++++++++++++ rewrite_domain:" + rewrite_domain);
+  chrome.webRequest.onBeforeRequest.addListener(
+    rewriteDomain,
+    { urls: [ rewrite_domain + "/*" ] },
+    [ "blocking" ]
+  );
+  localStorage["isDomainActive"] = true;
+}
+
+function inactiveRewriteDomain() {
+  console.log("--------------------------------------");
+  chrome.webRequest.onBeforeRequest.removeListener(rewriteDomain);
+  localStorage["isDomainActive"] = false;
+}
+
+function rewriteDomain(detail) {
+  var rewrite_domain = localStorage.getItem("rewrite-domain");
+  var changed_domain = localStorage.getItem("changed-domain");
+
+  // オプション未指定時は処理を行わない
+  if(!rewrite_domain || !changed_domain) {
+      return;
+  }
+  var newUrl = detail.url.replace(rewrite_domain, changed_domain);
+console.log("RewritTo: " + newUrl);
+
+  return { redirectUrl: newUrl };
 }

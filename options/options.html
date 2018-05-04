@@ -7,26 +7,47 @@
 　　<link rel="stylesheet" href="style.css" media="screen" type="text/css" />
 </head>
 <body>
-<h1>オプション</h1>
+<h1>パラメータ引継ぎ</h1>
 <table>
 <tr>
-  <td><h4><div id="status">有効</div></h4></td>
+  <td><h4><div id="params_status">有効</div></h4></td>
   <td>
-    <input class='tgl tgl-light' id='cb1' type='checkbox' checked="false">
-    <label class='tgl-btn' for='cb1'></label>
+    <input class='tgl tgl-light' id='params_cb' type='checkbox' checked="false">
+    <label class='tgl-btn' for='params_cb'></label>
   </td>
 </tr>
 </table>
 <table class="input-item-table">
 <tr>
   <td><h4>対象URL</h4></td>
-  <td><input id="input-domain" type="text" value="" /></td>
+  <td><input id="input-params-url" type="text" value="" /></td>
 </tr>
 <tr>
   <td><h4>対象パラメータ</h4></td>
-  <td><input id="input-param" type="text" value="" /></td>
+  <td><input id="input-params" type="text" value="" /></td>
 </tr>
 </table>
+<h1>ドメイン書き換え</h1>
+<table>
+<tr>
+  <td><h4><div id="domain_status">有効</div></h4></td>
+  <td>
+    <input class='tgl tgl-light' id='domain_cb' type='checkbox' checked="false">
+    <label class='tgl-btn' for='domain_cb'></label>
+  </td>
+</tr>
+</table>
+<table class="input-item-table">
+<tr>
+  <td><h4>対象ドメイン</h4></td>
+  <td><input id="input-rewrite-domain" type="text" value="" /></td>
+</tr>
+<tr>
+  <td><h4>変更後ドメイン</h4></td>
+  <td><input id="input-changed-domain" type="text" value="" /></td>
+</tr>
+</table>
+
 <input id="save" type="submit" value="保存" />
 </body>
 <html>

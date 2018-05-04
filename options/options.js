@@ -2,39 +2,67 @@
 $(function(){
   $(document).ready(function () {
 
-    $("#input-domain").val(localStorage.getItem("domain"));
-    if($("#input-domain").val() == "") {
-        $("#input-domain").val("https://*/*");
+    $("#input-params-url").val(localStorage.getItem("params-url"));
+    if($("#input-params-url").val() == "") {
+        $("#input-params-url").val("https://*/*");
     }
 
-    $("#input-param").val(localStorage.getItem("param"));
-    $("#cb1").prop("checked", localStorage.getItem("isActive") == "true");
-    if($("#cb1").prop('checked')) {
-      $("#status").text("有効");
+    $("#input-params").val(localStorage.getItem("params"));
+    $("#input-rewrite-domain").val(localStorage.getItem("rewrite-domain"));
+    $("#input-changed-domain").val(localStorage.getItem("changed-domain"));
+
+    $("#params_cb").prop("checked", localStorage.getItem("isParamsActive") == "true");
+    if($("#params_cb").prop('checked')) {
+      $("#params_status").text("有効");
     } else {
-      $("#status").text("無効");
+      $("#params_status").text("無効");
+    }
+
+    $("#domain_cb").prop("checked", localStorage.getItem("isDomainActive") == "true");
+    if($("#domain_cb").prop('checked')) {
+      $("#domain_status").text("有効");
+    } else {
+      $("#domain_status").text("無効");
     }
   });
 
-  $("#cb1").change(function () {
+  $("#params_cb").change(function () {
     var bg = chrome.extension.getBackgroundPage();
-    if($("#cb1").prop('checked')) {
-      $("#status").text("有効");
-      bg.activeAddParam();
+    if($("#params_cb").prop('checked')) {
+      $("#params_status").text("有効");
+      bg.activeAddParams();
     } else {
-      $("#status").text("無効");
-      bg.inactiveAddParam();
+      $("#params_status").text("無効");
+      bg.inactiveAddParams();
     }
   });
+
+  $("#domain_cb").change(function () {
+    var bg = chrome.extension.getBackgroundPage();
+    if($("#domain_cb").prop('checked')) {
+      $("#domain_status").text("有効");
+      bg.activeRewriteDomain();
+    } else {
+      $("#domain_status").text("無効");
+      bg.inactiveRewriteDomain();
+    }
+  });
+
 
   // 保存ボタンが押されたら、ローカルストレージに保存する。
   $("#save").click(function () {
-    localStorage["domain"] = $("#input-domain").val();
-    localStorage["param"] = $("#input-param").val();
+    localStorage["params-url"] = $("#input-params-url").val();
+    localStorage["params"] = $("#input-params").val();
+    localStorage["rewrite-domain"] = $("#input-rewrite-domain").val();
+    localStorage["changed-domain"] = $("#input-changed-domain").val();
     var bg = chrome.extension.getBackgroundPage();
-    if(localStorage.getItem("isActive") == "true") {
-      bg.restart();
+    if(localStorage.getItem("isParamsActive") == "true") {
+      bg.restartAddParams();
     }
+    if(localStorage.getItem("isDomainActive") == "true") {
+      bg.restartRewriteDomain();
+    }
+
     window.open('about:blank','_self').close();
   });
 });
