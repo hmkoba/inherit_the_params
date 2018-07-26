@@ -8,6 +8,8 @@ $(function(){
     }
 
     $("#input-params").val(localStorage.getItem("params"));
+    $("#input-params-fix-url").val(localStorage.getItem("params-fix-url"));
+    $("#input-params-fix").val(localStorage.getItem("params-fix"));
     $("#input-rewrite-domain").val(localStorage.getItem("rewrite-domain"));
     $("#input-changed-domain").val(localStorage.getItem("changed-domain"));
 
@@ -53,6 +55,8 @@ $(function(){
   $("#save").click(function () {
     localStorage["params-url"] = $("#input-params-url").val();
     localStorage["params"] = $("#input-params").val();
+    localStorage["params-fix-url"] = $("#input-params-fix-url").val();
+    localStorage["params-fix"] = $("#input-params-fix").val();
     localStorage["rewrite-domain"] = $("#input-rewrite-domain").val();
     localStorage["changed-domain"] = $("#input-changed-domain").val();
     var bg = chrome.extension.getBackgroundPage();

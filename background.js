@@ -71,8 +71,11 @@ function redirectWithParams( detail ) {
     var params_url = localStorage.getItem("params-url");
     var params = localStorage.getItem("params");
 
+    var params_fix_url = localStorage.getItem("params-fix-url");
+    var params_fix = localStorage.getItem("params-fix");
+
     // オプション未指定時は処理を行わない
-    if(!params_url || !params) {
+    if(params_url == null || params == null || params_url == "" || params == "") {
         return;
     }
 
@@ -106,21 +109,32 @@ function redirectWithParams( detail ) {
       }
     }
 
-//console.log("params_url:" + params_url + "  param:" + tkParam);
 //console.log("url:" + detail.url);
 //console.log("currentUrl:" + currentUrl);
 
-    // 遷移元URLから対象パラメータの値を取得
-    var org_param = "";
-    var splitedCurrentUrl = currentUrl.split("?");
-    org_params = splitedCurrentUrl[1].split('&');
-    for(var i = 0; i < params.length; i++) {
-      if(org_params[i].indexOf(params) >= 0) {
-        org_param = org_params[i];
-        break;
+//console.log("params_fix_url:" + params_fix_url);
+//console.log("params_fix:" + params_fix);
+
+    // 固定設定があれば上書き
+    if(params_fix_url != null && params_fix_url != "" &&
+       params_fix != null && params_fix != "" &&
+       -1 != detail.url.indexOf(params_fix_url)) {
+//      console.log("fix");
+
+          org_param = params_fix;
+    } else {
+      // 遷移元URLから対象パラメータの値を取得
+      var org_param = "";
+      var splitedCurrentUrl = currentUrl.split("?");
+      org_params = splitedCurrentUrl[1].split('&');
+      for(var i = 0; i < params.length; i++) {
+        if(org_params[i].indexOf(params) >= 0) {
+          org_param = org_params[i];
+          break;
+        }
       }
     }
-//console.log("param:" + param);
+//console.log("param:" + org_param);
 
     if(detail.url.indexOf("?") <= -1){
       var newUrl = detail.url + "?" + org_param;
